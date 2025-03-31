@@ -13,7 +13,7 @@ const Login: React.FC = () => {
     try {
       const response = await login(email, password);
       localStorage.setItem('access_token', response.data.access_token);
-      navigate('/');
+      navigate('/todo');
     } catch (err) {
       setError('Falha ao fazer login');
     }
