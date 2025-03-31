@@ -4,7 +4,9 @@ import { useNavigate } from 'react-router-dom';
 // import { isAuthenticated } from '../utils/auth';
 
 const API_URL = 'http://localhost:3000/tasks';
-const USER_ID = 3;
+//teste fixo
+// const USER_ID = 3;
+
 
 const getUserIdFromToken = () => {
   const token = localStorage.getItem('access_token');
@@ -14,6 +16,8 @@ const getUserIdFromToken = () => {
   return decoded.sub;
 };
 
+const userId = getUserIdFromToken();
+
 const ToDoList: React.FC = () => {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<any[]>([]);
@@ -21,21 +25,23 @@ const ToDoList: React.FC = () => {
   const [filter, setFilter] = useState('todos');
 
   useEffect(() => {
-    const token = localStorage.getItem('access_token');
-    if (!token) {
-      navigate('/login');
+    if (!userId) {
+      navigate('/login'); // se nao estiver autenticado redireciona para o login
     } else {
       fetchTasks();
     }
-  }, []);
+  }, [userId, filter]);
 
   const fetchTasks = async () => {
+    if (!userId) return;
+
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.get('http://localhost:3000/tasks/3', {
+      const response = await axios.get(`http://localhost:3000/tasks/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        params: { status: filter },
       });
       setTasks(response.data);
     } catch (error) {
@@ -45,10 +51,21 @@ const ToDoList: React.FC = () => {
 
   const handleCreateTask = async () => {
     if (newTaskDescription.trim()) {
+      const userId = getUserIdFromToken();
+      if (!userId) {
+        console.error('Usuário não autenticado');
+        return;
+      }
+
       try {
+        const token = localStorage.getItem('access_token');
         await axios.post(API_URL, {
           description: newTaskDescription,
-          userId: USER_ID,
+          userId: userId,
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         setNewTaskDescription('');
         fetchTasks();
@@ -58,31 +75,86 @@ const ToDoList: React.FC = () => {
     }
   };
 
-  const handleToggleCompletion = async (id: number) => {
+  const handleToggleCompletion = async (id: number, currentStatus: boolean) => {
+    console.log('Botão clicado! ID:', id, 'Status atual:', currentStatus);
+
     try {
-      await axios.patch(`${API_URL}/toggle/${id}`);
+      const token = localStorage.getItem('access_token');
+
+      await axios.patch(`${API_URL}/toggle/${id}`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       fetchTasks();
     } catch (error) {
       console.error('Erro ao alternar conclusão:', error);
     }
   };
 
-  const handleDeleteTask = async (id: number) => {
+
+  const handleReopenTask = async (id: number) => {
     try {
-      await axios.delete(`${API_URL}/${id}`);
+      const token = localStorage.getItem('access_token');
+      await axios.patch(`${API_URL}/toggle/${id}`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      fetchTasks();
+    } catch (error) {
+      console.error('Erro ao reabrir tarefa:', error);
+    }
+  };
+
+
+
+
+
+
+  const handleDeleteTask = async (id: number) => {
+    const userId = getUserIdFromToken();
+    if (!userId) {
+      console.error('Usuário não autenticado');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('access_token');
+      await axios.delete(`${API_URL}/${id}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: { userId: userId },
+      });
       fetchTasks();
     } catch (error) {
       console.error('Erro ao excluir tarefa:', error);
     }
   };
 
+
   const handleEditTask = async (id: number, description: string) => {
     const newDescription = prompt('Editar Tarefa', description);
     if (newDescription !== null) {
+      const userId = getUserIdFromToken(); // id do usuario do token jwrt
+      if (!userId) {
+        console.error('Usuário não autenticado');
+        return;
+      }
+
       try {
+        const token = localStorage.getItem('access_token');
         await axios.patch(`${API_URL}/${id}`, {
           description: newDescription,
           status: 'pendente',
+          userId: userId,
+        }, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         fetchTasks();
       } catch (error) {
@@ -91,9 +163,17 @@ const ToDoList: React.FC = () => {
     }
   };
 
-  useEffect(() => {
-    fetchTasks();
-  }, [filter]);
+
+  // useEffect(() => {
+  //   fetchTasks();
+  // }, [filter]);
+
+  const filteredTasks = tasks.filter((task: any) => {
+    if (filter === 'todos') return true;
+    if (filter === 'pendente' && !task.completed) return true;
+    if (filter === 'concluída' && task.completed) return true;
+    return false;
+  });
 
   return (
     <div className="todo-container">
@@ -116,15 +196,27 @@ const ToDoList: React.FC = () => {
       </div>
 
       <ul>
-        {tasks.length > 0 ? (
-          tasks.map((task: any) => (
+        {filteredTasks.length > 0 ? (
+          filteredTasks.map((task: any) => (
             <li key={task.id} className="task-item">
               <span
                 className={`task-description ${task.completed ? 'completed' : ''}`}
-                onClick={() => handleToggleCompletion(task.id)}
               >
                 {task.description}
               </span>
+
+              {task.completed && (
+                <button onClick={() => handleReopenTask(task.id)}>
+                  Reabrir
+                </button>
+              )}
+
+              {!task.completed && (
+                <button onClick={() => handleToggleCompletion(task.id, task.completed)}>
+                  Concluir
+                </button>
+              )}
+
               <button onClick={() => handleEditTask(task.id, task.description)}>Editar</button>
               <button onClick={() => handleDeleteTask(task.id)}>Excluir</button>
             </li>
