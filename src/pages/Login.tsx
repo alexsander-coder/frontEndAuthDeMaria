@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { login } from '../api/auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -12,13 +12,10 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       const response = await login(email, password);
-      const { access_token } = response.data;
-      console.log("Login realizado com sucesso:", access_token);
-      localStorage.setItem('access_token', access_token);
+      localStorage.setItem('access_token', response.data.access_token);
       navigate('/');
     } catch (err) {
       setError('Falha ao fazer login');
-      console.error(err);
     }
   };
 
@@ -29,24 +26,19 @@ const Login: React.FC = () => {
       <form onSubmit={handleLogin}>
         <div className="form-group">
           <label>Email:</label>
-          <input 
-            type="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-          />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div className="form-group">
           <label>Senha:</label>
-          <input 
-            type="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
-          />
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
         <button type="submit">Entrar</button>
       </form>
+
+      <p>
+        Ainda não tem cadastro?{' '}
+        <Link to="/register">Cadastre-se</Link>
+      </p>
     </div>
   );
 };

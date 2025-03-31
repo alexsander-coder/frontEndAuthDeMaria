@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { register } from '../api/auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Register: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -27,24 +27,19 @@ const Register: React.FC = () => {
       <form onSubmit={handleRegister}>
         <div className="form-group">
           <label>Email:</label>
-          <input 
-            type="email" 
-            value={email} 
-            onChange={(e) => setEmail(e.target.value)} 
-            required 
-          />
+          <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </div>
         <div className="form-group">
           <label>Senha:</label>
-          <input 
-            type="password" 
-            value={password} 
-            onChange={(e) => setPassword(e.target.value)} 
-            required 
-          />
+          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
         </div>
         <button type="submit">Cadastrar</button>
       </form>
+
+      <p>
+        Já tem uma conta?{' '}
+        <Link to="/login">Faça login</Link>
+      </p>
     </div>
   );
 };
