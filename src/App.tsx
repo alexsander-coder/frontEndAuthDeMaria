@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import ToDoList from './pages/ToDoList';
 
 const App: React.FC = () => {
+
   return (
     <Router>
       <div>
@@ -12,7 +13,7 @@ const App: React.FC = () => {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/todo" element={<ToDoList />} />
-          <Route path="/" element={<div className="container"><h1>Bem-vindo!</h1></div>} />
+          {/* <Route path="/" element={<div className="container"><h1>Bem-vindo!</h1></div>} /> */}
         </Routes>
       </div>
     </Router>

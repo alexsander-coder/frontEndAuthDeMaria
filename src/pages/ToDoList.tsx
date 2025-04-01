@@ -16,13 +16,13 @@ const getUserIdFromToken = () => {
   return decoded.sub;
 };
 
-const userId = getUserIdFromToken();
 
 const ToDoList: React.FC = () => {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<any[]>([]);
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [filter, setFilter] = useState('todos');
+  const userId = getUserIdFromToken();
 
   useEffect(() => {
     if (!userId) {
@@ -175,9 +175,16 @@ const ToDoList: React.FC = () => {
     return false;
   });
 
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+    navigate('/login');
+  };
+
   return (
     <div className="todo-container">
       <h2>To-Do List</h2>
+
+      <button onClick={handleLogout}>Logout</button>
 
       <div className="task-input">
         <input
