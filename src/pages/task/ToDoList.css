@@ -1,37 +1,16 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap');
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-  font-family: 'Roboto', sans-serif;
-  background: #f0f2f5;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  position: relative;
-}
-
 .todo-container {
   width: 90%;
   max-width: 600px;
   height: 600px;
-  overflow-y: auto;
-  -ms-overflow-style: none;
-  scrollbar-width: none;
   background: #fff;
   border-radius: 16px;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   padding: 40px;
   margin: 2rem auto;
   position: relative;
-}
-
-.todo-container::-webkit-scrollbar {
-  display: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
 .todo-container h2 {
@@ -43,16 +22,24 @@ body {
 
 .logout-btn {
   background: transparent;
-  border: none;
   color: #667eea;
-  font-size: 0.9rem;
+  font-size: 1rem;
   position: absolute;
   top: 20px;
   right: 20px;
   cursor: pointer;
-  transition: color 0.3s;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 8px 12px;
+  transition: background-color 0.3s, color 0.3s;
 }
 
+.logout-btn:hover {
+  background-color: #ff7a7a;
+  color: #fff;
+}
+
+/* Área de input para criar tarefa */
 .task-input {
   display: flex;
   gap: 12px;
@@ -114,6 +101,8 @@ ul {
   list-style: none;
   padding: 0;
   margin: 0;
+  overflow-y: auto;
+  flex-grow: 1;
 }
 
 .task-item {
@@ -156,76 +145,79 @@ ul {
   color: #556cd6;
 }
 
-
-
-
-
-
-
-
-
-.todo-container {
-  width: 90%;
-  max-width: 600px;
-  height: 600px;
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-  padding: 40px;
-  margin: 2rem auto;
-  position: relative;
+/* Estilos do Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
   display: flex;
-  flex-direction: column;
-}
-
-.logout-btn {
-  background: transparent;
-  color: #667eea;
-  font-size: 0.9rem;
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  cursor: pointer;
-  transition: color 0.3s;
-  flex: 1;
-  padding: 12px;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.3s ease;
-  width: 72px;
-}
-
-.logout-btn:hover {
-  color: white;
-  background-color: #ff7a7a;
-}
-
-
-.todo-container ul {
-  flex-grow: 1;
-  max-height: 100%;
-  overflow-y: auto;
-
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-  margin: 0;
-  padding: 0;
-}
-
-.todo-container ul::-webkit-scrollbar {
-  display: none;
-}
-
-.task-item {
-  display: flex;
+  justify-content: center;
   align-items: center;
-  justify-content: space-between;
+  z-index: 1000;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.modal h3 {
+  margin-top: 0;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.modal input {
+  width: 100%;
   padding: 12px;
-  border-bottom: 1px solid #f0f0f0;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
+  margin-bottom: 20px;
+  transition: border-color 0.3s;
+}
+
+.modal input:focus {
+  border-color: #667eea;
+  outline: none;
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.modal-buttons button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
   transition: background-color 0.3s;
 }
 
-.task-item:hover {
-  background-color: #f9f9f9;
+.modal-buttons button:first-child {
+  background-color: #667eea;
+  color: #fff;
+}
+
+.modal-buttons button:first-child:hover {
+  background-color: #556cd6;
+}
+
+.modal-buttons button:last-child {
+  background-color: #ddd;
+  color: #333;
+}
+
+.modal-buttons button:last-child:hover {
+  background-color: #ccc;
 }

@@ -2,32 +2,32 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import './ToDoList.css';
-// import { isAuthenticated } from '../utils/auth';
 
 const API_URL = 'http://localhost:3000/tasks';
-//teste fixo
-// const USER_ID = 3;
-
 
 const getUserIdFromToken = () => {
   const token = localStorage.getItem('access_token');
   if (!token) return null;
-
-  const decoded: any = JSON.parse(atob(token.split('.')[1]));
-  return decoded.sub;
+  try {
+    const decoded: any = JSON.parse(atob(token.split('.')[1]));
+    return decoded.sub;
+  } catch (error) {
+    console.error("Erro ao decodificar o token:", error);
+    return null;
+  }
 };
-
 
 const ToDoList: React.FC = () => {
   const navigate = useNavigate();
   const [tasks, setTasks] = useState<any[]>([]);
   const [newTaskDescription, setNewTaskDescription] = useState('');
   const [filter, setFilter] = useState('todos');
+  const [editingTask, setEditingTask] = useState<{ id: number; description: string } | null>(null);
   const userId = getUserIdFromToken();
 
   useEffect(() => {
     if (!userId) {
-      navigate('/login'); // se nao estiver autenticado redireciona para o login
+      navigate('/login');
     } else {
       fetchTasks();
     }
@@ -35,139 +35,122 @@ const ToDoList: React.FC = () => {
 
   const fetchTasks = async () => {
     if (!userId) return;
-
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.get(`http://localhost:3000/tasks/${userId}`, {
+      const response = await axios.get(`${API_URL}/${userId}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         },
-        params: { status: filter },
+        params: { status: filter }
       });
       setTasks(response.data);
     } catch (error) {
-      console.error('Erro ao buscar tarefas:', error);
+      console.error("Erro ao buscar tarefas:", error);
     }
   };
 
   const handleCreateTask = async () => {
     if (newTaskDescription.trim()) {
-      const userId = getUserIdFromToken();
       if (!userId) {
-        console.error('Usuário não autenticado');
+        console.error("Usuário não autenticado");
         return;
       }
-
       try {
         const token = localStorage.getItem('access_token');
         await axios.post(API_URL, {
           description: newTaskDescription,
-          userId: userId,
+          userId: userId
         }, {
           headers: {
-            Authorization: `Bearer ${token}`,
-          },
+            Authorization: `Bearer ${token}`
+          }
         });
         setNewTaskDescription('');
         fetchTasks();
       } catch (error) {
-        console.error('Erro ao criar tarefa:', error);
+        console.error("Erro ao criar tarefa:", error);
       }
     }
   };
 
   const handleToggleCompletion = async (id: number, currentStatus: boolean) => {
-    console.log('Botão clicado! ID:', id, 'Status atual:', currentStatus);
-
     try {
       const token = localStorage.getItem('access_token');
-
       await axios.patch(`${API_URL}/toggle/${id}`, {}, {
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
+          Authorization: `Bearer ${token}`
+        }
       });
-
       fetchTasks();
     } catch (error) {
-      console.error('Erro ao alternar conclusão:', error);
+      console.error("Erro ao alternar conclusão:", error);
     }
   };
-
 
   const handleReopenTask = async (id: number) => {
     try {
       const token = localStorage.getItem('access_token');
       await axios.patch(`${API_URL}/toggle/${id}`, {}, {
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
+          Authorization: `Bearer ${token}`
+        }
       });
-
       fetchTasks();
     } catch (error) {
-      console.error('Erro ao reabrir tarefa:', error);
+      console.error("Erro ao reabrir tarefa:", error);
     }
   };
 
-
-
-
-
-
   const handleDeleteTask = async (id: number) => {
-    const userId = getUserIdFromToken();
     if (!userId) {
-      console.error('Usuário não autenticado');
+      console.error("Usuário não autenticado");
       return;
     }
-
     try {
       const token = localStorage.getItem('access_token');
       await axios.delete(`${API_URL}/${id}`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${token}`
         },
-        data: { userId: userId },
+        data: { userId: userId }
       });
       fetchTasks();
     } catch (error) {
-      console.error('Erro ao excluir tarefa:', error);
+      console.error("Erro ao excluir tarefa:", error);
     }
   };
 
+  const openEditModal = (id: number, description: string) => {
+    setEditingTask({ id, description });
+  };
 
-  const handleEditTask = async (id: number, description: string) => {
-    const newDescription = prompt('Editar Tarefa', description);
-    if (newDescription !== null) {
-      const userId = getUserIdFromToken(); // id do usuario do token jwrt
-      if (!userId) {
-        console.error('Usuário não autenticado');
-        return;
-      }
-
-      try {
-        const token = localStorage.getItem('access_token');
-        await axios.patch(`${API_URL}/${id}`, {
-          description: newDescription,
-          status: 'pendente',
-          userId: userId,
-        }, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        fetchTasks();
-      } catch (error) {
-        console.error('Erro ao editar tarefa:', error);
-      }
+  const handleEditSubmit = async () => {
+    if (!editingTask) return;
+    if (!userId) {
+      console.error("Usuário não autenticado");
+      return;
+    }
+    try {
+      const token = localStorage.getItem('access_token');
+      await axios.patch(`${API_URL}/${editingTask.id}`, {
+        description: editingTask.description,
+        status: 'pendente',
+        userId: userId
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      setEditingTask(null);
+      fetchTasks();
+    } catch (error) {
+      console.error("Erro ao editar tarefa:", error);
     }
   };
 
-
-  // useEffect(() => {
-  //   fetchTasks();
-  // }, [filter]);
+  const handleEditCancel = () => {
+    setEditingTask(null);
+  };
 
   const filteredTasks = tasks.filter((task: any) => {
     if (filter === 'todos') return true;
@@ -183,10 +166,8 @@ const ToDoList: React.FC = () => {
 
   return (
     <div className="todo-container">
-      <h2>To-Do List</h2>
-
+      <h2>Tarefas</h2>
       <button className="logout-btn" onClick={handleLogout}>Sair</button>
-
 
       <div className="task-input">
         <input
@@ -208,25 +189,15 @@ const ToDoList: React.FC = () => {
         {filteredTasks.length > 0 ? (
           filteredTasks.map((task: any) => (
             <li key={task.id} className="task-item">
-              <span
-                className={`task-description ${task.completed ? 'completed' : ''}`}
-              >
+              <span className={`task-description ${task.completed ? 'completed' : ''}`}>
                 {task.description}
               </span>
-
-              {task.completed && (
-                <button onClick={() => handleReopenTask(task.id)}>
-                  Reabrir
-                </button>
+              {task.completed ? (
+                <button onClick={() => handleReopenTask(task.id)}>Reabrir</button>
+              ) : (
+                <button onClick={() => handleToggleCompletion(task.id, task.completed)}>Concluir</button>
               )}
-
-              {!task.completed && (
-                <button onClick={() => handleToggleCompletion(task.id, task.completed)}>
-                  Concluir
-                </button>
-              )}
-
-              <button onClick={() => handleEditTask(task.id, task.description)}>Editar</button>
+              <button onClick={() => openEditModal(task.id, task.description)}>Editar</button>
               <button onClick={() => handleDeleteTask(task.id)}>Excluir</button>
             </li>
           ))
@@ -234,6 +205,25 @@ const ToDoList: React.FC = () => {
           <p>Não há tarefas para mostrar.</p>
         )}
       </ul>
+
+      {editingTask && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h3>Editar Tarefa</h3>
+            <input
+              type="text"
+              value={editingTask.description}
+              onChange={(e) =>
+                setEditingTask({ ...editingTask, description: e.target.value })
+              }
+            />
+            <div className="modal-buttons">
+              <button onClick={handleEditSubmit}>Salvar</button>
+              <button onClick={handleEditCancel}>Cancelar</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
