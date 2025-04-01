@@ -38,9 +38,7 @@ const ToDoList: React.FC = () => {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get(`${API_URL}/${userId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
+        headers: { Authorization: `Bearer ${token}` },
         params: { status: filter }
       });
       setTasks(response.data);
@@ -61,9 +59,7 @@ const ToDoList: React.FC = () => {
           description: newTaskDescription,
           userId: userId
         }, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
+          headers: { Authorization: `Bearer ${token}` }
         });
         setNewTaskDescription('');
         fetchTasks();
@@ -77,9 +73,7 @@ const ToDoList: React.FC = () => {
     try {
       const token = localStorage.getItem('access_token');
       await axios.patch(`${API_URL}/toggle/${id}`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
       });
       fetchTasks();
     } catch (error) {
@@ -91,9 +85,7 @@ const ToDoList: React.FC = () => {
     try {
       const token = localStorage.getItem('access_token');
       await axios.patch(`${API_URL}/toggle/${id}`, {}, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
       });
       fetchTasks();
     } catch (error) {
@@ -109,9 +101,7 @@ const ToDoList: React.FC = () => {
     try {
       const token = localStorage.getItem('access_token');
       await axios.delete(`${API_URL}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
+        headers: { Authorization: `Bearer ${token}` },
         data: { userId: userId }
       });
       fetchTasks();
@@ -137,9 +127,7 @@ const ToDoList: React.FC = () => {
         status: 'pendente',
         userId: userId
       }, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
+        headers: { Authorization: `Bearer ${token}` }
       });
       setEditingTask(null);
       fetchTasks();
@@ -170,8 +158,7 @@ const ToDoList: React.FC = () => {
       <button className="logout-btn" onClick={handleLogout}>Sair</button>
 
       <div className="task-input">
-        <input
-          type="text"
+        <textarea
           value={newTaskDescription}
           onChange={(e) => setNewTaskDescription(e.target.value)}
           placeholder="Digite a descrição da tarefa"
@@ -193,18 +180,21 @@ const ToDoList: React.FC = () => {
                 {task.description}
               </span>
               {task.completed ? (
-                <button onClick={() => handleReopenTask(task.id)}>Reabrir</button>
+                <button className="btn-reopen" onClick={() => handleReopenTask(task.id)}>Reabrir</button>
               ) : (
-                <button onClick={() => handleToggleCompletion(task.id, task.completed)}>Concluir</button>
+                <button className="btn-complete" onClick={() => handleToggleCompletion(task.id, task.completed)}>Concluir</button>
               )}
-              <button onClick={() => openEditModal(task.id, task.description)}>Editar</button>
-              <button onClick={() => handleDeleteTask(task.id)}>Excluir</button>
+              {!task.completed && (
+                <button className="btn-edit" onClick={() => openEditModal(task.id, task.description)}>Editar</button>
+              )}
+              <button className="btn-delete" onClick={() => handleDeleteTask(task.id)}>Excluir</button>
             </li>
           ))
         ) : (
           <p>Não há tarefas para mostrar.</p>
         )}
       </ul>
+
 
       {editingTask && (
         <div className="modal-overlay">
