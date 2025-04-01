@@ -184,7 +184,8 @@ const ToDoList: React.FC = () => {
     <div className="todo-container">
       <h2>To-Do List</h2>
 
-      <button onClick={handleLogout}>Logout</button>
+      <button className="logout-btn" onClick={handleLogout}>Sair</button>
+
 
       <div className="task-input">
         <input
