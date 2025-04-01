@@ -1,8 +1,8 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ToDoList from './pages/ToDoList';
+import Login from './pages/login/Login';
+import Register from './pages/register/Register';
+import ToDoList from './pages/task/ToDoList';
 
 const App: React.FC = () => {
 

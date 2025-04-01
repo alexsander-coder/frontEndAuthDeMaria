@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { register } from '../api/auth';
+import { register } from '../../api/auth';
 import { useNavigate, Link } from 'react-router-dom';
+import './Register.css';
 
 const Register: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ const Register: React.FC = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+
     try {
       const response = await register(email, password);
       console.log("Usuário cadastrado:", response.data);
