@@ -84,9 +84,9 @@ textarea::-webkit-scrollbar {
   font-size: 1rem;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  margin-left: 351px;
+  margin-left: 74%;
   margin-bottom: 40px;
-  padding: 7px 12px
+  padding: 7px 19px 7px 17px;
 }
 
 .task-input button:hover {

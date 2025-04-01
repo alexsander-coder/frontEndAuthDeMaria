@@ -154,7 +154,7 @@ const ToDoList: React.FC = () => {
 
   return (
     <div className="todo-container">
-      <h2>Tarefas</h2>
+      <h2>To-Do List</h2>
       <button className="logout-btn" onClick={handleLogout}>Sair</button>
 
       <div className="task-input">
@@ -180,21 +180,20 @@ const ToDoList: React.FC = () => {
                 {task.description}
               </span>
               {task.completed ? (
-                <button className="btn-reopen" onClick={() => handleReopenTask(task.id)}>Reabrir</button>
+                <button onClick={() => handleReopenTask(task.id)}>Reabrir</button>
               ) : (
-                <button className="btn-complete" onClick={() => handleToggleCompletion(task.id, task.completed)}>Concluir</button>
+                <button onClick={() => handleToggleCompletion(task.id, task.completed)}>Concluir</button>
               )}
               {!task.completed && (
-                <button className="btn-edit" onClick={() => openEditModal(task.id, task.description)}>Editar</button>
+                <button onClick={() => openEditModal(task.id, task.description)}>Editar</button>
               )}
-              <button className="btn-delete" onClick={() => handleDeleteTask(task.id)}>Excluir</button>
+              <button onClick={() => handleDeleteTask(task.id)}>Excluir</button>
             </li>
           ))
         ) : (
           <p>Não há tarefas para mostrar.</p>
         )}
       </ul>
-
 
       {editingTask && (
         <div className="modal-overlay">

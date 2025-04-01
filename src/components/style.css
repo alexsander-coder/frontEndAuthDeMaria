@@ -1,0 +1,26 @@
+/* .phrase-ticker {
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  margin: 20px 0;
+}
+
+.phrase {
+  display: inline-block;
+  font-size: 1rem;
+  color: #333;
+  animation: slideIn 1s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+} */
